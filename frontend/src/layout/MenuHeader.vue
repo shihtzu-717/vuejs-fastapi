@@ -1,7 +1,6 @@
 <template>
+  <form @submit.prevent="postInputData()" method="post" enctype="multipary/form-data" >
   <div class="wrap" style="height: 180px">
-    <!-- <h1>Header</h1>ß
-      <router-link to="/">Home</router-link> / <router-link to="/bar">Go to Bar</router-link> -->
     <div id="model-bg">
       <br />
       <text class="menu">MODEL</text><br /><br />
@@ -10,10 +9,6 @@
           모델 선택 :
         </span>
         <input type="text" v-model="model_name" />
-        <!-- <select v-model="selectedModel">
-            <option >모델을 선택하세요.</option>
-            <option :value="model.name" :key="model.name" v-for="model in modelList" >{{ model.name }}</option>
-        </select> -->
         <br />
         <span style="display: inline-block; width: 17%; text-align: justify">
           iou_thresh :
@@ -30,12 +25,15 @@
       <br />
       <text class="menu">DATA</text><br /><br />
       <div id="data">
-        파일을 선택하세요. <br /><input type="file" multiple /><br />
+        파일을 선택하세요. <br />
+        <input type="file" multiple @change="uploadImage($event.target.files)" ref="files"><br/>
       </div>
     </div>
   </div>
-  <button id="inference_btn">추론 시작</button>
-  <span>{{ msg }}</span>
+  <input type="submit" id="inference_btn" value="추론 시작"/>
+  </form>
+  <span>{{ msg }} </span>
+  <span> {{ model_name }} {{ iou_thresh}} {{thresh }} {{ image_list }}</span>
 </template>
 
 <script>
@@ -43,32 +41,47 @@ import axios from 'axios'
 export default {
   data() {
     return {
-      modelList: [
-        { name: '220830' },
-        { name: '220222' },
-        { name: '000918' },
-        { name: '210717' }
-      ],
       model_name: '',
       iou_thresh: '0.5',
       thresh: '0.25',
+      image_list: [],
+      uploadImageIndex: 0,
       msg: ''
     }
   },
   methods: {
-    getMessage() {
+    postInputData() {
+      const formData = new FormData()
+      formData.append('model_name', this.model_name)
+      formData.append('iou_thresh', this.iou_thresh)
+      formData.append('thresh', this.thresh)
+
+      for (const f of this.image_list) {
+        formData.append('image_list', f)
+      }
+
       axios
-        .get('/')
+        .post('/', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         .then((res) => {
-          this.msg = res.data
+          console.log(res)
         })
-        .catch((error) => {
-          console.error(error)
+        .catch((res) => {
+          console.log('error', res)
         })
+    },
+    uploadImage(files) {
+      console.log('THAP')
+      this.image_list = files
+      console.log(this.image_list)
+    },
+
+    created() {
+      this.getMessage()
     }
-  },
-  created() {
-    this.getMessage()
   }
 }
 </script>

@@ -1,29 +1,41 @@
 <template>
-    <div class="hello">
+  <div class="hello">
     <!-- img tag를 이용한 일반적인 Image 생성. -->
-    <header class="logo">
-    </header>
+    <header class="logo"></header>
     <!-- v-viewer를 이용한 Image 생성. -->
     <viewer :images="this.images">
-        <img style="width: 300px;" class="gallary_image" v-for="image in this.images" :src="image" :key="image" />
-
+      <img
+        style="width: 300px"
+        class="gallary_image"
+        v-for="image in this.images"
+        :src="image"
+        :key="image"
+      />
     </viewer>
-    </div>
+  </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   data() {
     return {
-      images: ['https://images.pexels.com/photos/67636/rose-blue-flower-rose-blooms-67636.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-        'https://images.pexels.com/photos/93684/pexels-photo-93684.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-        'https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-        'https://images.pexels.com/photos/1073567/pexels-photo-1073567.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-        'https://images.pexels.com/photos/35884/amazing-beautiful-beauty-blue.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260']
+      images: []
+      // images: [require('@/img/1.jpg'), require('@/img/2.jpg'), require('@/img/3.jpg'), require('@/img/lacuna-1.jpg'), require('@/img/lacuna-2.jpg'),
+      //   require('@/img/lacuna-3.jpg'), require('@/img/lacuna-4.jpg'), require('@/img/thornapple-1.jpeg'), require('@/img/thornapple-2.png'), require('@/img/blackstar.png')]
     }
   },
   inited(viewer) {
     this.$viewer = viewer
+  },
+  methods: {
+    getResult() {
+      axios.get('/').then((res) => {
+        console.log('infernece')
+        console.log(res.data)
+        this.images = res.data
+      })
+    }
   }
 }
 </script>
